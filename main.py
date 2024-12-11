@@ -1,48 +1,8 @@
 # --------------------------- Homework_6.1  ------------------------------------
 """
 Виконав: Григорій Чернолуцький
-Homework_7
-Завдання.
-1. Cтворити проект python будь-яким способом, що реалізує архітектуру програмного
-скрипта одного з блоків структурної схеми за власним вибором.
-2. Створити віртуальне середовище - Virtual Environment.
-сформуйте властивості у файлі requirements.txt;
-встановіть пакет із файлу requirements.txt.
-архів проекту надайте на перевірку
-2. Створити віртуальне середовище - Virtual Environment.
-сформуйте властивості у файлі requirements.txt;
-встановіть пакет із файлу requirements.txt.
-архів проекту надайте на перевірку.
-*** додаткове завдання для самостійного опрацювання + 2 бали.
-3. Зареєструйтесь на сайті https://github.com
-створіть приватний (Private!!!) репозиторій з ім’ям lesson-4-9.
-відповідно до інструкцій https://docs.github.com/en/get-started/quickstart/hello-world -
-завантажте створений Вами проект до репозиторію Lesson-4-9.
-Посилання на репозиторій додайте до архіву проекту.
-Порядок реалізації Блоку 2 структурної схеми рис. 1.
-1. Оберіть джерело даних дистанційного зондування Землі (ДЗЗ) з переліку:
-https://www.kaggle.com/
-https://paperswithcode.com/
-https://www.sentinel-hub.com/
-https://livingatlas2.arcgis.com/landsatexplorer/
-https://www.bing.com/maps
-https://unitar.org/maps/map/3525
-https://mapcarta.com/Map
-за власним вибором
-або будь-яке цифрове зображення.
-2. Оберіть район поверхні землі та цікаві об’єкти / об’єкт, наприклад: посівні
-території; зелені насадження; вирубки лісів; стаціонарні об’єкти забудови; рухомі об’єкти
-тощо.
-3. Проведіть дослідження процесів цифрової обробки зображень з переліку скрипта
-Im_PIL.py – щоб вибудовати послідовність, яка дозволяє отримати чіткій замкнутий контур
-обраного об’єкту.
-4. Для знайденої комбінації етапів цифрової обробки зображень проведіть
-рефакторинг (редагування) програмного коду скрипта Im_PIL.py за принципами
-архітектурної «чистоти» - стандарти РЕР, принципи SOLID.
-Рівень складності І – 4 бали. Реалізувати завдання з реалізації Блоку 1, структурної
-схеми рис. 1.
-Рівень складності II – 6 балів. Реалізувати завдання з реалізації на вибір Блоку 2, або
-Блоку 3 структурної схеми рис. 1.
+Homework_15.1
+
 
 Package Version
 ------- -------
@@ -50,15 +10,36 @@ pip 24.3.1
 
 """
 import pandas as pd
+import dao.grud
+from dao.grud import insert_one_metal
 from package_parsing import (
-    parsing_site_bank_gav_ua
+    parsing_minfin_com_ua
 )
 
 def package_parsing_main_def() -> None:
-    print("\nКурс НБУ")
-    URL_TEMPLATE = "https://bank.gov.ua/ua/markets/exchangerates"
+    data = {'code': [], 'literal': [], 'name': [], 'price': [],'delta': [],'delta100': [], 'date' : []}
+    print("\nКурс металів НБУ")
+    URL_BASE = "https://index.minfin.com.ua/ua/exchange/archive/nbu/"
+    for year in range(2023,2025):
+        for month in range(12,13):
+            for day in range(19,32):
+                date = f"{str(year)}-{str(month):>02}-{str(day):>02}"
+                URL_TEMPLATE = f"{URL_BASE}{date}/"
+                print(f"Запит даних за {date}")
+                scraping = parsing_minfin_com_ua(URL_TEMPLATE, caption_text ="металів")
+                for row in scraping:
+                    row.pop(3)
+                    print(row)
+                    data['code'].append(row[0])
+                    data['literal'].append(row[1])
+                    data['name'].append(row[2])
+                    data['price'].append(row[3])
+                    data['delta'].append(row[4])
+                    data['delta100'].append(row[5])
+                    data['date'].append(date)
+                    insert_one_metal(row[0],row[1],row[2],row[3],row[4],row[5],date)
 
-    df = pd.DataFrame(data=parsing_site_bank_gav_ua(URL_TEMPLATE))
+    df = pd.DataFrame(data)
     df.to_csv("output/exchange.csv")
     df.to_excel("output/exchange.xlsx")
     df.to_json("output/exchange.json")

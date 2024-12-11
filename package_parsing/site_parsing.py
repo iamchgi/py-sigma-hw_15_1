@@ -9,9 +9,12 @@ df.to_json("output.json")
 
 Package                      Version
 ---------------------------- -----------
-pip                          23.1
-requests                     2.28.2
-beautifulsoup4               4.12.3
+pip                          24.3.1
+requests~=2.32.3
+beautifulsoup4~=4.12.3
+pandas~=2.2.3
+numpy~=2.2.0
+openpyxl~=3.1.5
 
 """
 
@@ -19,14 +22,16 @@ import requests
 from bs4 import BeautifulSoup as bs
 
 
-def parsing_site_bank_gav_ua(URL_TEMPLATE) -> dict:
+def parsing_minfin_com_ua(URL_TEMPLATE, caption_text) -> list:
     """
     site parsing python
     web scraping / site scraping python
     Data scraping - швидше очищення та підготовка даних
     https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_excel.html
 
-    :param URL_TEMPLATE: URL Site work.ua
+    Oz – тройська унція = 31.10348 грам
+
+    :param URL_TEMPLATE: URL Site https://index.minfin.com.ua/ua/exchange/archive/nbu/
     :return: class 'dict'
     """
 
@@ -37,46 +42,16 @@ def parsing_site_bank_gav_ua(URL_TEMPLATE) -> dict:
     Зміни в аргументі для методу get: headers=headers - МИ відрекомендувались звичайним браузером при зверненні до серверу.
     '''
     r = requests.get(URL_TEMPLATE, headers=headers)
-    result_list = {'code': [], 'literal': [], 'count': [], 'name': [], 'course': []}
     soup = bs(r.text, "html.parser")
-    exchange_code = soup.find_all('span', class_="value")
-    exchange_literal = soup.find_all('td', attrs={"data-label": "Код літерний"})
-    exchange_count = soup.find_all('td', attrs={"data-label": "Кількість одиниць валюти"})
-    exchange_name = soup.find_all('td', attrs={"data-label": 'Назва валюти'})
-    exchange_course = soup.find_all('td', attrs={"data-label": 'Офіційний курс'})
-    constant = 0  # для балансування даних
-    i = 0
-    for code in exchange_code:
-        i = i + 1
-        if (i < (len(exchange_code) - constant)):
-            result_list['code'].append(code.text)
-    i = 0
-    for literal in exchange_literal:
-        i = i + 1
-        if (i < (len(exchange_literal) - constant)):
-            result_list['literal'].append(literal.text)
-
-    i = 0
-    for name in exchange_name:
-        i = i + 1
-        if (i < (len(exchange_name) - constant)):
-            result_list['name'].append(name.text.replace("\n", "").replace("  ", ""))
-
-    i = 0
-    for count in exchange_count:
-        i = i + 1
-        if (i < (len(exchange_count) - constant)):
-            result_list['count'].append(count.text)
-
-    i = 0
-    for course in exchange_course:
-        i = i + 1
-        if (i < (len(exchange_course) - constant)):
-            result_list['course'].append(course.text)
-
-    print(result_list['code'])
-    print(result_list['literal'])
-    print(result_list['count'])
-    print(result_list['name'])
-    print(result_list['course'])
-    return result_list
+    tables = soup.find_all("table")
+    # table = soup.find("table", caption=lambda text: text and caption_text in text)
+    result = []
+    for table in tables:
+        if table.find("caption") and table.find("caption").text and caption_text in table.find("caption").text:
+            print(table.find("caption").text)
+            rows = table.find_all("tr")          # Извлечение строк таблицы
+            for row in rows:
+                cells = row.find_all(["td"])  # Учитываем как <td>, так и <th>   (["td", "th"])
+                if cells:
+                   result.append([cell.text.strip().replace("\xa0"," ") for cell in cells])
+    return result
