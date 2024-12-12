@@ -4,6 +4,7 @@ temp
 .idea
 
 currency.db
+bank.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

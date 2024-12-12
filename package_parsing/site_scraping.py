@@ -1,20 +1,14 @@
 # ------------------ HTTP: для парсингу сайтів ----------------------------
 """
 
-Приклад
-парсингу сайтів із збереженням інформації до файлів різного формату
-df.to_csv("output.csv")
-df.to_excel("output.xlsx")
-df.to_json("output.json")
-
 Package                      Version
 ---------------------------- -----------
 pip                          24.3.1
-requests~=2.32.3
-beautifulsoup4~=4.12.3
-pandas~=2.2.3
-numpy~=2.2.0
-openpyxl~=3.1.5
+requests                     2.32.3
+beautifulsoup4               4.12.3
+pandas                       2.2.3
+numpy                        2.2.0
+openpyxl                     3.1.5
 
 """
 
@@ -22,7 +16,7 @@ import requests
 from bs4 import BeautifulSoup as bs
 
 
-def parsing_minfin_com_ua(URL_TEMPLATE, caption_text) -> list:
+def scraping_minfin_com_ua(URL_TEMPLATE, caption_text) -> list:
     """
     site parsing python
     web scraping / site scraping python
@@ -49,9 +43,9 @@ def parsing_minfin_com_ua(URL_TEMPLATE, caption_text) -> list:
     for table in tables:
         if table.find("caption") and table.find("caption").text and caption_text in table.find("caption").text:
             print(table.find("caption").text)
-            rows = table.find_all("tr")          # Извлечение строк таблицы
+            rows = table.find_all("tr")  # Вилучення строк таблиці
             for row in rows:
-                cells = row.find_all(["td"])  # Учитываем как <td>, так и <th>   (["td", "th"])
+                cells = row.find_all(["td"])  # Можливо как <td>, так и <th> але не треба поки  (["td", "th"])
                 if cells:
-                   result.append([cell.text.strip().replace("\xa0"," ") for cell in cells])
+                    result.append([cell.text.strip().replace("\xa0", " ") for cell in cells])
     return result

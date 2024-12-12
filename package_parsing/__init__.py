@@ -1,3 +1,3 @@
-from .site_parsing import parsing_minfin_com_ua
+from .site_scraping import scraping_minfin_com_ua
 
 
