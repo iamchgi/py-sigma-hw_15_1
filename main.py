@@ -184,12 +184,12 @@ def show_currencies_price(currencies) -> None:
 # --------------------------------- main module ----------------------------------------------
 if __name__ == '__main__':
     init_db()
-    clear_all_metals()
-    scrapo_parsing_metal_main()
+    # clear_all_metals()
+    # scrapo_parsing_metal_main()
     show_metals_price(("Срібло", "Золото", "Платина", "Паладій"))
 
-    clear_all_currency()
-    scrapo_parsing_currency_main()
+    # clear_all_currency()
+    # scrapo_parsing_currency_main()
     show_currencies_price(("долар США", "Євро"))
     close_db()
 
