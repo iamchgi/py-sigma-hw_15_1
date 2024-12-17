@@ -2,7 +2,7 @@
 # ------------------------ Демонстрація парсингу сайтика ----------------------------
 """
 Виконав: Григорій Чернолуцький
-Homework_15.1
+Homework_16
 
 парсингу сайтів із збереженням інформації до файлів різного формату
 df.to_csv("output.csv")
@@ -180,49 +180,72 @@ def show_currencies_price(currencies) -> None:
         show_currency_price(currency)
     return None
 
+# Bitcoin part ----------------------------------------------
+def file_column_parsing (file_name, data_name):
+    """
+    :param file_name:
+    :param data_name:
+    :return:
+    """
+    d = pd.read_csv(file_name)
+    print(d)
+    for name, values in d[[data_name]].items():
+    # for name, values in d[[data_name]].iteritems(): # приклад оновлення версій pandas для директиви iteritems
+        print(values)
+    S_real = np.zeros((len(values)))
+    for i in range(len(values)):
+        S_real[i] = values[i]
+        # S_real[i] = values[i].replace(",", "")
+    return S_real
+
+def file_parsing (file_name) -> dict:
+    """
+    :param file_name:
+    :return: dict
+    """
+    data = pd.read_csv(file_name)
+    return data.to_dict()
+
+def save_to_bitoks_db(bitochki):
+    i = len(bitochki['Date'])
+    while i > 0:
+        i -= 1
+        insert_one_bitochek(bitochki['Date'][i], bitochki['Price'][i].replace(",", ""), bitochki['Open'][i], bitochki['High'][i],
+                         bitochki['Low'][i], bitochki['Vol.'][i], bitochki['Change %'][i].replace(" %", ""))
+    print("Дані збережені в DB")
+
+def show_bitochek_price() -> None:
+    rows = get_all_bitochki_price()
+    i = 0
+    arr = np.zeros(len(rows))
+    for row in rows:
+        arr[i] = float(row[0])
+        i += 1
+    show_result_image(arr, "Bitochek")
+    return None
 
 # --------------------------------- main module ----------------------------------------------
 if __name__ == '__main__':
     init_db()
     # clear_all_metals()
     # scrapo_parsing_metal_main()
-    show_metals_price(("Срібло", "Золото", "Платина", "Паладій"))
+    # show_metals_price(("Срібло", "Золото", "Платина", "Паладій"))
 
     # clear_all_currency()
     # scrapo_parsing_currency_main()
-    show_currencies_price(("долар США", "Євро"))
+    # show_currencies_price(("долар США", "Євро"))
+
+    back_bitok = file_column_parsing("output/bitcoin2011-24.csv", "price")
+    show_result_image(back_bitok, "bitok")
+
+    # clear_all_bitki()
+    # save_to_bitoks_db(file_parsing("input/sourse_Bitok2011-2024.csv"))
+
+    # show_bitochek_price()
+
     close_db()
 
-''' 
 
-Беремо курс металів НБУ
-Запит даних за 2024-12-06
-Офіційний курс банківських металів НБУ на 6.12.2024
-Запит даних за 2024-12-07
-Запит даних за 2024-12-08
-Запит даних за 2024-12-09
-Офіційний курс банківських металів НБУ на 9.12.2024
-Запит даних за 2024-12-10
-Офіційний курс банківських металів НБУ на 10.12.2024
-Запит даних за 2024-12-11
-Офіційний курс банківських металів НБУ на 11.12.2024
-['959', 'XAU', 'Золото', '110324,4700', '+425.9200', '+0.388 %', '2024-12-06']
-['961', 'XAG', 'Срібло', '1303,5200', '+29.3600', '+2.304 %', '2024-12-06']
-['962', 'XPT', 'Платина', '39250,5700', '+280.4400', '+0.720 %', '2024-12-06']
-['964', 'XPD', 'Паладій', '40700,6600', '+687.7100', '+1.719 %', '2024-12-06']
-['959', 'XAU', 'Золото', '109336,2400', '-988.2300', '-0.896 %', '2024-12-09']
-['961', 'XAG', 'Срібло', '1291,8700', '-11.6500', '-0.894 %', '2024-12-09']
-['962', 'XPT', 'Платина', '38868,8200', '-381.7500', '-0.973 %', '2024-12-09']
-['964', 'XPD', 'Паладій', '40430,0400', '-270.6200', '-0.665 %', '2024-12-09']
-['959', 'XAU', 'Золото', '110228,3600', '+892.1200', '+0.816 %', '2024-12-10']
-['961', 'XAG', 'Срібло', '1316,0400', '+24.1700', '+1.871 %', '2024-12-10']
-['962', 'XPT', 'Платина', '39447,9500', '+579.1300', '+1.490 %', '2024-12-10']
-['964', 'XPD', 'Паладій', '40980,8900', '+550.8500', '+1.362 %', '2024-12-10']
-['959', 'XAU', 'Золото', '111411,7000', '+1183.3400', '+1.074 %', '2024-12-11']
-['961', 'XAG', 'Срібло', '1327,1600', '+11.1200', '+0.845 %', '2024-12-11']
-['962', 'XPT', 'Платина', '39270,4000', '-177.5500', '-0.450 %', '2024-12-11']
-['964', 'XPD', 'Паладій', '40541,2300', '-439.6600', '-1.073 %', '2024-12-11']
-Дані збережені в файли
-Дані збережені в DB
+"""
 
-'''
+"""
